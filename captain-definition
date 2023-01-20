@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "dockerfileLines": [
+    "FROM library/python:3.10.9-alpine",
+    "RUN apk update && apk upgrade && apk add --no-cache make g++ bash git openssh postgresql-dev curl",
+    "RUN apk add gcc musl-dev python3-dev libffi-dev openssl-dev cargo",
+    "RUN mkdir -p /usr/src/app",
+    "WORKDIR /usr/src/app",
+    "COPY ./papkort/ /usr/src/app",
+    "RUN pip install --upgrade pip",
+    "RUN pip install -r requirements.txt",
+    "COPY ./utils/ /usr/src/utils",
+    "RUN mkdir -p /logs",
+    "EXPOSE 80",
+    "CMD sh /usr/src/utils/run.sh"
+  ]
+}
