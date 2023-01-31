@@ -2,10 +2,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-# Create your models here.
 class Person(models.Model):
     name = models.CharField(max_length=64)
 
+    def __str__(self):
+        return f'{self.name}'
 
 class Deck(models.Model):
     class Color(models.TextChoices):
@@ -35,7 +36,7 @@ class Deck(models.Model):
         ABZAN = 'wbg', _('Abzan')
         JESKAI = 'urw', _('Jeskai')
         SULTAI = 'bgu', _('Sultai')
-        MARDU = 'rwb', _('Mardu')
+        MARDU = 'rwb', _('Mardu (rwb)')
         TEMUR = 'gur', _('Temur')
 
         YORE_TILLER = 'wubr', _('Yore-Tiller')
@@ -45,24 +46,35 @@ class Deck(models.Model):
         WITCH_MAW = 'gwub', _('Witch-Maw')
         FIVE_COLOR = 'wubrg', _('Five Color')
 
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, blank=True, null=True)
     commander = models.CharField(max_length=64)
     color = models.CharField(
         choices=Color.choices,
         max_length=16
     )
-    description = models.TextField()
-    url = models.CharField(max_length=128)
+    description = models.TextField(blank=True, null=True)
+    url = models.CharField(max_length=128, blank=True, null=True)
 
-
-class Player(models.Model):
-    person = models.ForeignKey(Person)
-    deck = models.ForeignKey(Deck)
-
-    position integerfield
+    def __str__(self):
+        if self.name:
+            return f'{self.name} ({self.commander})'
+        else:
+            return self.commander
 
 
 class Match(models.Model):
-    - date
-    - list of players. many to many
-    - notes
+    class Meta:
+        verbose_name_plural = 'matches'
+
+    date = models.DateField()
+    description = models.TextField(blank=True, null=True)
+
+
+class Player(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    deck = models.ForeignKey(Deck, on_delete=models.PROTECT)
+    position = models.IntegerField()
+    match = models.ForeignKey(Match, related_name='players', on_delete=models.PROTECT)
+
+
+
