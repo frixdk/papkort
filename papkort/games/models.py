@@ -69,12 +69,20 @@ class Match(models.Model):
     date = models.DateField()
     description = models.TextField(blank=True, null=True)
 
+    def winner(self) -> list['Player']:
+        return self.players.filter(position=1)
+
+    def __str__(self):
+        return f'{self.date} - {", ".join([p.person.name for p in self.players.all()])} - ({", ".join([w.person.name for w in self.winner()])} won)'
 
 class Player(models.Model):
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     deck = models.ForeignKey(Deck, on_delete=models.PROTECT)
     position = models.IntegerField()
     match = models.ForeignKey(Match, related_name='players', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.person.name} ranked {self.position} with {self.deck}'
 
 
 
