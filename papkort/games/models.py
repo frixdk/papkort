@@ -8,6 +8,7 @@ class Person(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+
 class Deck(models.Model):
     class Color(models.TextChoices):
         WHITE = 'w', _('White')
@@ -74,6 +75,7 @@ class Match(models.Model):
 
     def __str__(self):
         return f'{self.date} - {", ".join([p.person.name for p in self.players.all()])} - ({", ".join([w.person.name for w in self.winner()])} won)'
+
 
 class Player(models.Model):
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
