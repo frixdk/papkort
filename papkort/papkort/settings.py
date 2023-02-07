@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'games'
+    'games',
 ]
 
 MIDDLEWARE = [
@@ -98,13 +98,16 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR,  "templates"),)
 # http://whitenoise.evans.io/en/stable/#quickstart-for-django-apps
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-
 if os.environ.get("CAPROVER") is None:
     from .settings_dev import *
 else:
     from .settings_caprover import *
 
+print("pancakes", BASE_DIR, os.path.join(BASE_DIR, "static_src"))
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static_src"),
+]
 
 #STATIC_URL = 'static/'
 

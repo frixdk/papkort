@@ -1,0 +1,27 @@
+
+{% include 'matches/external_stuff.html' %}
+
+<html data-bs-theme="dark">
+<head>
+
+{% include 'matches/menu.html' %}
+
+</head>
+
+<body>
+
+{% for match in matches %}
+<ul>
+    {% for player in match.players.all|dictsort:"position" %}
+    <li>
+        {{ player }}
+    </li>
+    {% endfor %}
+</ul>
+
+{% endfor %}
+
+</body>
+
+</html>
+

@@ -1,0 +1,24 @@
+
+{% include 'matches/external_stuff.html' %}
+
+<html data-bs-theme="dark">
+<head>
+
+{% include 'matches/menu.html' %}
+
+</head>
+
+<body>
+
+{% for deck in decks %}
+<ul>
+    <li>
+        {{ deck }}
+    </li>
+</ul>
+
+{% endfor %}
+
+</body>
+
+</html>
