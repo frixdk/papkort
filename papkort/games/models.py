@@ -37,7 +37,7 @@ class Deck(models.Model):
         ABZAN = 'wbg', _('Abzan')
         JESKAI = 'urw', _('Jeskai')
         SULTAI = 'bgu', _('Sultai')
-        MARDU = 'rwb', _('Mardu (rwb)')
+        MARDU = 'rwb', _('Mardu')
         TEMUR = 'gur', _('Temur')
 
         YORE_TILLER = 'wubr', _('Yore-Tiller')
@@ -55,6 +55,14 @@ class Deck(models.Model):
     )
     description = models.TextField(blank=True, null=True)
     url = models.CharField(max_length=128, blank=True, null=True)
+
+    def get_win_percentage(self):
+        won = self.player_set.filter(position=1).count()
+        played = self.player_set.count()
+        if played:
+            return f'{int( won / played * 100)}% ({won}/{played})'
+        else:
+            return 'No games played yet'
 
     def __str__(self):
         if self.name:

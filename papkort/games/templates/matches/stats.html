@@ -1,0 +1,96 @@
+{% extends 'matches/base.html' %}
+
+{% block title %}Matches{% endblock %}
+
+{% block content %}
+
+<div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="personWinPercentage"></canvas></div>
+
+<div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="deckWinPercentage"></canvas></div>
+
+    <script>
+
+const person_win_percentage = {{ person_win_percentage|safe }}
+const deck_win_percentage = {{ deck_win_percentage|safe }}
+
+var color = Chart.helpers.color;
+var chartColors = {
+	red: 'rgb(255, 99, 132)',
+	orange: 'rgb(255, 159, 64)',
+	yellow: 'rgb(255, 205, 86)',
+	green: 'rgb(75, 192, 192)',
+	blue: 'rgb(54, 162, 235)',
+	purple: 'rgb(153, 102, 255)',
+	grey: 'rgb(231,233,237)'
+};
+
+options = {
+    plugins: {
+      legend: {
+        labels: {
+            font: {
+                size: 20
+            },
+            color: "white"
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { color: 'white'},
+        grid: {
+          color: "grey"
+        }
+      },
+      x: {
+        ticks: { color: 'white'},
+        grid: {
+          color: "grey"
+        }
+      }
+    }
+
+  }
+
+const personConfig = {
+  type: 'bar',
+  data: {
+    labels: person_win_percentage.map(row => row.person),
+    datasets: [{
+      label: 'Person Win Percentage',
+      backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
+      borderColor: chartColors.red,
+      data: person_win_percentage.map(row => row.percentage),
+      borderWidth: 1
+    }]
+},
+  options: options,
+};
+
+  new Chart(
+    document.getElementById('personWinPercentage'), personConfig
+  );
+
+const deckConfig = {
+  type: 'bar',
+  data: {
+    labels: deck_win_percentage.map(row => row.deck),
+    datasets: [{
+      label: 'Deck Win Percentage',
+      data: deck_win_percentage.map(row => row.percentage),
+      borderWidth: 1
+    }]
+},
+  options: options,
+};
+
+  new Chart(
+    document.getElementById('deckWinPercentage'), deckConfig
+  );
+
+
+    </script>
+{% endblock %}
+
+

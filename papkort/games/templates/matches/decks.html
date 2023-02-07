@@ -1,24 +1,43 @@
 
-{% include 'matches/external_stuff.html' %}
+{% extends 'matches/base.html' %}
 
-<html data-bs-theme="dark">
-<head>
+{% block title %}Decks{% endblock %}
 
-{% include 'matches/menu.html' %}
+{% block content %}
 
-</head>
-
-<body>
-
-{% for deck in decks %}
-<ul>
-    <li>
-        {{ deck }}
-    </li>
-</ul>
-
+<table class="table table-dark">
+  <thead>
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Color</th>
+        <th scope="col">Commander</th>
+        <th scope="col">Win percentage</th>
+        <th scope="col">Description</th>
+        <th scope="col">Deck list</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for deck in decks %}
+    <tr>
+        <th scope="row">{{ deck.name }}</th>
+        <td>
+            {% include "matches/color_pips.html" with color=deck.color %}
+        </td>
+        <td>{{ deck.commander }}</td>
+        <td>{{ deck.get_win_percentage }}</td>
+        <td>{{ deck.description }}</td>
+        <td>
+            {% if deck.url %}
+                <a href="{{ deck.url }}">{{ deck.url }}</a>
+            {% endif %}
+        </td>
+    </tr>
 {% endfor %}
+  </tbody>
+</table>
 
-</body>
+{% endblock %}
 
-</html>
+
+
+
