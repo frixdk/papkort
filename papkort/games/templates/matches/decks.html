@@ -20,7 +20,7 @@
         <tbody>
             {% for deck in decks %}
             <tr>
-                <th scope="row">{{ deck.name }}</th>
+                <th scope="row">{% if deck.name %}{{ deck.name }}{% endif %}</th>
                 <td>
                     {% include "matches/color_pips.html" with color=deck.color %}
                 </td>
