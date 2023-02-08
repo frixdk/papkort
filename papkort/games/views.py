@@ -56,7 +56,6 @@ def stats(request):
 
     deck_win_percentage = []
     for deck, positions in deck_positions.items():
-        print("NIGGERS", dir(deck.color))
         deck_win_percentage.append({
             "deck": deck.__str__(),
             "percentage": positions.count(1) / len(positions) * 100
