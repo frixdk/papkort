@@ -6,36 +6,11 @@
             <img alt="c" height="20" width="20" src="{% static 'games/manac.svg' %}">
         </span>
     {% else %}
-    {% if 'w' in color %}
+    {% for l in color %}
         <span style="height: 20px; width: 20px;">
-            <img alt="w" height="20" width="20" src="{% static 'games/manaw.svg' %}">
+            <img alt="{{ l }}" height="20" width="20" src="{% static 'games/mana' %}{{ l }}.svg">
         </span>
-        {% endif %}
-        {% if 'u' in color %}
-        <span style="height: 20px; width: 20px;">
-            <img alt="u" height="20" width="20" src="{% static 'games/manau.svg' %}">
-        </span>
-        {% endif %}
-        {% if 'b' in color %}
-        <span style="height: 20px; width: 20px;">
-            <img alt="b" height="20" width="20" src="{% static 'games/manab.svg' %}">
-        </span>
-        {% endif %}
-        {% if 'r' in color %}
-        <span style="height: 20px; width: 20px;">
-            <img alt="r" height="20" width="20" src="{% static 'games/manar.svg' %}">
-        </span>
-        {% endif %}
-        {% if 'g' in color %}
-        <span style="height: 20px; width: 20px;">
-            <img alt="g" height="20" width="20" src="{% static 'games/manag.svg' %}">
-        </span>
-        {% endif %}
-        {% if 'c' in color %}
-        <span style="height: 20px; width: 20px;">
-            <img alt="g" height="20" width="20" src="{% static 'games/manag.svg' %}">
-        </span>
-        {% endif %}
+    {% endfor %}
     {% endif %}
 
     <span>{{ deck.get_color_display }}</span>

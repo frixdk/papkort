@@ -22,7 +22,17 @@ def matches(request):
 def decks(request):
     decks = Deck.objects.all()
 
-    context = {'decks': decks}
+    order = {
+        'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
+        'wu': 6, 'ub': 7, 'br': 8, 'rg': 9, 'gw': 10,
+        'wb': 11, 'ur': 12, 'bg': 13, 'rw': 14, 'gu': 15,
+        'wub': 16, 'ubr': 17, 'brg': 18, 'rgw': 19, 'gwu': 20,
+        'wbg': 21, 'urw': 22, 'bgu': 23,  'rwb': 24,  'gur': 25,
+        'wubr': 26, 'ubrg': 27, 'brgw': 28, 'rgwu': 29, 'gwub': 30,
+        'wubrg': 31
+    }
+
+    context = {'decks': sorted(decks, key=lambda x: order[x.color])}
 
     return render(request, 'matches/decks.html', context)
 
