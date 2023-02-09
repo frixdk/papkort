@@ -53,8 +53,10 @@ class Deck(models.Model):
         choices=Color.choices,
         max_length=16
     )
+    owner = models.ForeignKey(Person, on_delete=models.PROTECT, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     url = models.CharField(max_length=128, blank=True, null=True)
+
 
     def get_win_percentage(self):
         won = self.player_set.filter(position=1).count()

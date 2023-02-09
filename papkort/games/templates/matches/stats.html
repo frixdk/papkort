@@ -8,10 +8,13 @@
 
 <div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="deckWinPercentage"></canvas></div>
 
+<div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="colors"></canvas></div>
+
     <script>
 
 const person_win_percentage = {{ person_win_percentage|safe }}
 const deck_win_percentage = {{ deck_win_percentage|safe }}
+const deck_colors = {{ deck_colors|safe }}
 
 var color = Chart.helpers.color;
 var chartColors = {
@@ -21,10 +24,23 @@ var chartColors = {
 	green: 'rgb(75, 192, 192)',
 	blue: 'rgb(54, 162, 235)',
 	purple: 'rgb(153, 102, 255)',
-	grey: 'rgb(231,233,237)'
+	grey: 'rgb(231,233,237)',
+	mtg_white_light: 'rgb(248, 231, 185)',
+	mtg_white_dark: 'rgb(249, 250, 244)',
+	mtg_blue_light: 'rgb(179, 206, 234)',
+	mtg_blue_dark: 'rgb(14, 104, 171)',
+	mtg_red_light: 'rgb(235, 159, 130)',
+	mtg_red_dark: 'rgb(211, 32, 42)',
+	mtg_black_light: 'rgb(166, 159, 157)',
+	mtg_black_dark: 'rgb(21, 11, 0)',
+	mtg_green_light: 'rgb(196, 211, 202)',
+	mtg_green_dark: 'rgb(0, 115, 62)',
+	mtg_grey_light: 'rgb(231, 233, 237)',
+	mtg_grey_dark: 'rgb(150, 150, 150)',
 };
 
 options = {
+    indexAxis: 'y',
     plugins: {
       legend: {
         labels: {
@@ -87,6 +103,79 @@ const deckConfig = {
 
   new Chart(
     document.getElementById('deckWinPercentage'), deckConfig
+  );
+
+
+
+colorOptions = {
+    plugins: {
+      legend: {
+        labels: {
+            font: {
+                size: 20
+            },
+            color: "white"
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { color: 'white'},
+        grid: {
+          color: "grey"
+        }
+      },
+      x: {
+        ticks: { color: 'white'},
+        grid: {
+          color: "grey"
+        }
+      }
+    }
+
+  }
+
+const colorConfig = {
+  type: 'bar',
+  data: {
+    labels: ["White", "Blue", "Red", "Black", "Green", "Colorless"],
+    datasets: [{
+      label: 'Deck Color Usage',
+      data: [
+        deck_colors['w'],
+        deck_colors['u'],
+        deck_colors['r'],
+        deck_colors['b'],
+        deck_colors['g'],
+        deck_colors['colorless'],
+        ],
+      backgroundColor: [
+      color(chartColors.mtg_white_light).alpha(1).rgbString(),
+      color(chartColors.mtg_blue_light).alpha(1).rgbString(),
+      color(chartColors.mtg_red_light).alpha(1).rgbString(),
+      color(chartColors.mtg_black_light).alpha(1).rgbString(),
+      color(chartColors.mtg_green_light).alpha(1).rgbString(),
+      color(chartColors.mtg_grey_light).alpha(1).rgbString(),
+    ],
+    borderColor: [
+      chartColors.mtg_white_dark,
+      chartColors.mtg_blue_dark,
+      chartColors.mtg_red_dark,
+      chartColors.mtg_black_dark,
+      chartColors.mtg_green_dark,
+      chartColors.mtg_grey_dark,
+    ],
+      borderWidth: 3
+    }]
+},
+  options: colorOptions,
+};
+
+
+
+new Chart(
+    document.getElementById('colors'), colorConfig
   );
 
 

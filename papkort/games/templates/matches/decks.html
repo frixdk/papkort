@@ -10,6 +10,7 @@
         <thead>
         <tr>
             <th scope="col">Name</th>
+            <th scope="col">Owner</th>
             <th scope="col">Color</th>
             <th scope="col">Commander</th>
             <th scope="col">Win percentage</th>
@@ -21,6 +22,7 @@
             {% for deck in decks %}
             <tr>
                 <th scope="row">{% if deck.name %}{{ deck.name }}{% endif %}</th>
+                <td>{% if deck.owner %}{{ deck.owner }}{% endif %}</td>
                 <td>
                     {% include "matches/color_pips.html" with color=deck.color %}
                 </td>

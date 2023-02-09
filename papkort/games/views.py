@@ -61,9 +61,26 @@ def stats(request):
             "percentage": positions.count(1) / len(positions) * 100
         })
 
+    deck_colors = {
+        'w' : 0,
+        'u': 0,
+        'r': 0,
+        'b': 0,
+        'g': 0,
+        'colorless': 0
+    }
+
+    for d in Deck.objects.all():
+        if d.color == 'colorless':
+            deck_colors[d.color] += 1
+        else:
+            for color in d.color:
+                deck_colors[color] += 1
+
     context = {
         'person_win_percentage': sorted(person_win_percentage, key=lambda x: x["percentage"], reverse=True),
-        'deck_win_percentage': sorted(deck_win_percentage, key=lambda x: x["percentage"], reverse=True)
+        'deck_win_percentage': sorted(deck_win_percentage, key=lambda x: x["percentage"], reverse=True),
+        'deck_colors': deck_colors,
     }
 
     return render(request, 'matches/stats.html', context)
