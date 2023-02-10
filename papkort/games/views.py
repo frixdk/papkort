@@ -42,10 +42,23 @@ def stats(request):
 
     person_positions = defaultdict(list)
     deck_positions = defaultdict(list)
+    person_deck_color = defaultdict(lambda: defaultdict(int))
 
     for player in players:
         person_positions[player.person].append(player.position)
         deck_positions[player.deck].append(player.position)
+
+        if player.deck.color == 'colorless':
+            person_deck_color[player.person.name][player.deck.color] += 1
+        else:
+            for color in player.deck.color:
+                person_deck_color[player.person.name][color] += 1
+
+    #AAH DET ER FLAWED FORDI DEN TÆLLER PLAYS OG IKKE DECKS
+    person_deck_colors = []
+    for person, colors in person_deck_color.items():
+        colors['name'] = person
+        person_deck_colors.append(dict(colors))
 
     person_win_percentage = []
     for person, positions in person_positions.items():
@@ -81,6 +94,7 @@ def stats(request):
         'person_win_percentage': sorted(person_win_percentage, key=lambda x: x["percentage"], reverse=True),
         'deck_win_percentage': sorted(deck_win_percentage, key=lambda x: x["percentage"], reverse=True),
         'deck_colors': deck_colors,
+        'person_deck_colors': person_deck_colors
     }
 
     return render(request, 'matches/stats.html', context)

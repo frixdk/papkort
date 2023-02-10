@@ -4,19 +4,24 @@
 
 {% block content %}
 
-<div style="height: 600px; max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="personWinPercentage"></canvas></div>
+<div id="charts">
+    <div style="height: 600px; max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="personWinPercentage"></canvas></div>
 
-<div style="height: 1000px; max-width:1000px; padding-left: 5px; padding-bottom:20px">
-    <canvas id="deckWinPercentage"></canvas>
+    <div style="height: 1000px; max-width:1000px; padding-left: 5px; padding-bottom:20px">
+        <canvas id="deckWinPercentage"></canvas>
+    </div>
+
+    <div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="colors"></canvas></div>
+
 </div>
-
-<div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="colors"></canvas></div>
 
     <script>
 
 const person_win_percentage = {{ person_win_percentage|safe }}
 const deck_win_percentage = {{ deck_win_percentage|safe }}
 const deck_colors = {{ deck_colors|safe }}
+const personDeckColors = {{ person_deck_colors|safe }} // Jeg navngiver som det passer mig
+
 
 var color = Chart.helpers.color;
 var chartColors = {
@@ -110,6 +115,7 @@ const deckConfig = {
   );
 
 
+function addColorChart(elementId, chartName, colorData) {
 
 colorOptions = {
     plugins: {
@@ -145,15 +151,8 @@ const colorConfig = {
   data: {
     labels: ["White", "Blue", "Red", "Black", "Green", "Colorless"],
     datasets: [{
-      label: 'Deck Color Usage',
-      data: [
-        deck_colors['w'],
-        deck_colors['u'],
-        deck_colors['r'],
-        deck_colors['b'],
-        deck_colors['g'],
-        deck_colors['colorless'],
-        ],
+      label: chartName,
+      data: colorData,
       backgroundColor: [
       color(chartColors.mtg_white_light).alpha(1).rgbString(),
       color(chartColors.mtg_blue_light).alpha(1).rgbString(),
@@ -178,9 +177,50 @@ const colorConfig = {
 
 
 
+
 new Chart(
-    document.getElementById('colors'), colorConfig
+    document.getElementById(elementId), colorConfig
   );
+
+
+
+
+}
+
+
+
+addColorChart('colors', 'All Player Deck Colors', [
+        deck_colors['w'],
+        deck_colors['u'],
+        deck_colors['r'],
+        deck_colors['b'],
+        deck_colors['g'],
+        deck_colors['colorless'],
+        ])
+
+
+console.log(personDeckColors);
+
+
+
+personDeckColors.forEach(function (item, index) {
+
+  var elem = document.querySelector('#colors');
+  var clone = elem.cloneNode(true);
+  clone.id = 'personColor' + item['name'];
+  elem.after(clone);
+
+  addColorChart(clone.id, item['name'] + ' played colors', [
+          item['w'],
+          item['u'],
+          item['r'],
+          item['b'],
+          item['g'],
+          item['colorless'],
+  ])
+
+});
+
 
 
     </script>
