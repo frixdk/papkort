@@ -10,6 +10,9 @@
                     <a class="nav-link {% if request.path == '/matches' %}active{% endif %}" aria-current="page" href="{% url 'matches' %}">Matches</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/players' %}active{% endif %}" aria-current="page" href="{% url 'players' %}">Players</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {% if request.path == '/decks' %}active{% endif %}" aria-current="page" href="{% url 'decks' %}">Decks</a>
                 </li>
                 <li class="nav-item">

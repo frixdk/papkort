@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 
 from .models import Deck, Match, Player
 
@@ -17,6 +17,53 @@ def matches(request):
     context = {'matches': matches}
 
     return render(request, 'matches/matches.html', context)
+
+
+def players(request):
+    all_players = Player.objects.all()
+
+    player_data = defaultdict(lambda: {
+        'person': None,
+        'games_played': 0,
+        'games_won': 0,
+        'games_lost': 0,
+        'colors': {
+            'w': 0,
+            'u': 0,
+            'r': 0,
+            'b': 0,
+            'g': 0,
+            'colorless': 0
+        },
+        'deck_plays': defaultdict(int)
+    })
+
+    # Yeah, I know this gets slow at some point
+    for player in all_players:
+        player_data[player.person]['person'] = player.person
+        player_data[player.person]['games_played'] += 1
+        player_data[player.person]['games_won'] += 1 if player.position == 1 else 0
+        player_data[player.person]['deck_plays'][player.deck] += 1
+
+        if player.deck.color == 'colorless':
+            player_data[player.person]['colors'][player.deck.color] += 1
+        else:
+            for color in player.deck.color:
+                player_data[player.person]['colors'][color] += 1
+
+    # Calc win percentage most played color stuff lolo
+    for entry in player_data.values():
+        entry['win_percentage'] = int(entry['games_won'] / entry['games_played'] * 100)
+        entry['favorite_color'] = max(entry['colors'], key=entry['colors'].get)
+        entry['owned_decks'] = entry['person'].deck_set.count
+        entry['favorite_deck'] = max(entry['deck_plays'], key=entry['deck_plays'].get)
+        entry['favorite_deck_plays'] = entry['deck_plays'][entry['favorite_deck']]
+
+    context = {'players': sorted(player_data.values(), key=lambda x: x['win_percentage'], reverse=True)}
+
+    return render(request, 'matches/players.html', context)
+
+
 
 
 def decks(request):
