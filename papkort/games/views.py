@@ -1,10 +1,11 @@
 # Create your views here.
 from collections import defaultdict
 
+from django.db.models import Count, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from .models import Deck, Match, Player
+from .models import Deck, Match, Person, Player
 
 
 def index(request):
@@ -18,6 +19,40 @@ def matches(request):
 
     return render(request, 'matches/matches.html', context)
 
+
+# ChatGPT wrote most of this view. I gave it the models.
+def person_stats(request, person_id):
+    # Get the person object
+    person = Person.objects.get(id=person_id)
+
+    # Count the number of matches played by the person
+    num_matches = Match.objects.filter(players__person=person).count()
+
+    # Count the number of wins by the person
+    num_wins = Player.objects.filter(position=1, person=person).count()
+
+    # Compute the win percentage of the person
+    win_percentage = f'{int(num_wins / num_matches * 100)}%' if num_matches > 0 else 'N/A'
+
+    # Count the number of times each color was played by the person
+    color_counts = person.player_set.values('deck__color').annotate(count=Count('deck__color'))
+    # Append pretty color choice name
+    for color_count in color_counts:
+        color_count['color_name'] = dict(Deck.Color.choices)[color_count['deck__color']]
+
+    # ChatGPT couldn't figure this out
+    deck_counts = Deck.objects.filter(player__person=person).annotate(count=Count('player__deck')).order_by('-count')
+
+    context = {
+        'person': person,
+        'num_matches': num_matches,
+        'num_wins': num_wins,
+        'win_percentage': win_percentage,
+        'deck_colors': color_counts,
+        'deck_counts': deck_counts
+    }
+
+    return render(request, 'matches/person.html', context)
 
 def players(request):
     all_players = Player.objects.all()

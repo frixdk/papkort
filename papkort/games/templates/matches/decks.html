@@ -24,7 +24,7 @@
                 <th scope="row">{% if deck.name %}{{ deck.name }}{% endif %}</th>
                 <td>{% if deck.owner %}{{ deck.owner }}{% endif %}</td>
                 <td>
-                    {% include "matches/color_pips.html" with color=deck.color %}
+                    {% include "matches/color_pips.html" with color=deck.color name=deck.get_color_display %}
                 </td>
                 <td>{{ deck.commander }}</td>
                 <td>{{ deck.get_win_percentage }}</td>
