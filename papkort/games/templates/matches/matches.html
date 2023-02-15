@@ -18,15 +18,39 @@
     <tr>
       <th scope="row">{{ match.date }}</th>
       <td>
+
+          <div class="table-responsive">
+              <table class="table table-dark">
+                  <thead>
+                  <tr>
+                      <th scope="col">#</th>
+                      <th>Player</th>
+                      <th>Deck </th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% for player in match.players.all|dictsort:"position" %}
+                      <tr>
+                          <th scope="row">{{ player.position }}</th>
+                          <td>
+                              <a href="{% url 'person_stats' person_id=player.person.id %}">
+                                  {{ player.person }}
+                              </a>
+                          </td>
+                          <td>
+                              {% include "matches/color_pips.html" with color=player.deck.color name=player.deck %}
+                          </td>
+                      </tr>
+                  {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+
           <ul>
-            {% for player in match.players.all|dictsort:"position" %}
-            <li>
-                {{ player }}
-            </li>
-            {% endfor %}
-        </ul>
+
+          </ul>
       </td>
-      <td>{{ match.description }}</td>
+      <td style="max-width: 300px">{{ match.description }}</td>
     </tr>
 {% endfor %}
   </tbody>
