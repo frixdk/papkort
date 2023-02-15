@@ -1,8 +1,6 @@
-# Create your views here.
 from collections import defaultdict
 
-from django.db.models import Count, Prefetch
-from django.http import HttpResponse
+from django.db.models import Count
 from django.shortcuts import redirect, render
 
 from .models import Deck, Match, Person, Player
@@ -106,8 +104,6 @@ def players(request):
     context = {'players': sorted(player_data.values(), key=lambda x: x['win_percentage'], reverse=True)}
 
     return render(request, 'matches/players.html', context)
-
-
 
 
 def decks(request):
