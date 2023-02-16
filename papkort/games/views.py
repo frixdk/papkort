@@ -48,6 +48,18 @@ def person_stats(request, person_id):
     # ChatGPT couldn't figure this out
     deck_counts = Deck.objects.filter(player__person=person).annotate(count=Count('player__deck')).order_by('-count')
 
+    owned_decks = Deck.objects.filter(owner=person)
+
+    order = {
+        'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
+        'wu': 6, 'ub': 7, 'br': 8, 'rg': 9, 'gw': 10,
+        'wb': 11, 'ur': 12, 'bg': 13, 'rw': 14, 'gu': 15,
+        'wub': 16, 'ubr': 17, 'brg': 18, 'rgw': 19, 'gwu': 20,
+        'wbg': 21, 'urw': 22, 'bgu': 23, 'rwb': 24, 'gur': 25,
+        'wubr': 26, 'ubrg': 27, 'brgw': 28, 'rgwu': 29, 'gwub': 30,
+        'wubrg': 31
+    }
+
     context = {
         'person': person,
         'num_matches': num_matches,
@@ -55,7 +67,8 @@ def person_stats(request, person_id):
         'win_percentage': win_percentage,
         'deck_colors': color_identity_counts,
         'deck_counts': deck_counts,
-        'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True)
+        'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True),
+        'decks': sorted(owned_decks, key=lambda x: order[x.color])
     }
 
     return render(request, 'matches/person.html', context)

@@ -3,7 +3,7 @@
 {% block title %}{{ person }}{% endblock %}
 
 {% block content %}
-    <h1>{{ person.name }}'s Statistics</h1>
+    <h3>{{ person.name }}'s Statistics</h3>
     <p>
         Played <strong>{{ num_matches }}</strong> matches.
     </p>
@@ -74,5 +74,9 @@
             </tbody>
         </table>
     </div>
+
+Owned decks:
+
+  {% include "matches/decks_table.html" with decks=decks %}
 
 {% endblock %}

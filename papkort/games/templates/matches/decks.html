@@ -5,45 +5,7 @@
 
 {% block content %}
 
-<div class="table-responsive">
-    <table class="table table-dark">
-        <thead>
-        <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Owner</th>
-            <th scope="col">Color</th>
-            <th scope="col">Commander</th>
-            <th scope="col">Win percentage</th>
-        <th scope="col">Description</th>
-        <th scope="col">Decklist</th>
-        </tr>
-        </thead>
-        <tbody>
-            {% for deck in decks %}
-            <tr>
-                <th scope="row">{% if deck.name %}{{ deck.name }}{% endif %}</th>
-                <td>
-                    {% if deck.owner %}
-                    <a href="{% url 'person_stats' person_id=deck.owner_id %}">
-                        {{ deck.owner }}
-                    </a>
-                {% endif %}</td>
-                <td>
-                    {% include "matches/color_pips.html" with color=deck.color name=deck.get_color_display %}
-                </td>
-                <td>{{ deck.commander }}</td>
-                <td>{{ deck.get_win_percentage }}</td>
-                <td>{{ deck.description }}</td>
-                <td>
-                    {% if deck.url %}
-                    <a href="{{ deck.url }}">{{ deck.url }}</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+{% include "matches/decks_table.html" with decks=decks %}
 
 {% endblock %}
 

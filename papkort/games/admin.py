@@ -5,7 +5,7 @@ from .models import Deck, Match, Person, Player
 
 
 class DeckAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("commander", "name", "owner", "color", "get_win_percentage")
 
 
 class PlayerInline(StackedInline):
