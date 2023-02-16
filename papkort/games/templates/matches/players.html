@@ -9,8 +9,8 @@
     <thead>
     <tr>
         <th scope="col">Name</th>
-        <th>Games </th>
         <th>Decks</th>
+        <th>Games played</th>
         <th>Wins</th>
         <th>Win %</th>
         <th>Most played color</th>
@@ -19,17 +19,21 @@
     </thead>
     <tbody>
     {% for player in players %}
-        <tr>
-            <th scope="row">{{ player.person }}</th>
-            <td>{{ player.owned_decks }}</td>
-            <td>{{ player.games_played }}</td>
-            <td>{{ player.games_won }}</td>
-            <td>{{ player.win_percentage }}</td>
-            <td>
-                {% include "matches/color_pips.html" with color=player.favorite_color %}
-            </td>
-        <td>{{ player.favorite_deck }} (Played {{ player.favorite_deck_plays }} times)</td>
-        </tr>
+            <tr>
+                <th scope="row">
+                    <a href="{% url 'person_stats' person_id=player.person.id %}">
+                        {{ player.person }}
+                    </a>
+                </th>
+                <td>{{ player.owned_decks }}</td>
+                <td>{{ player.games_played }}</td>
+                <td>{{ player.games_won }}</td>
+                <td>{{ player.win_percentage }}</td>
+                <td>
+                    {% include "matches/color_pips.html" with color=player.favorite_color %}
+                </td>
+                <td>{{ player.favorite_deck }} (Played {{ player.favorite_deck_plays }} times)</td>
+            </tr>
     {% endfor %}
     </tbody>
 </table>

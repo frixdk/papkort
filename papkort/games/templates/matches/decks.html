@@ -22,9 +22,14 @@
             {% for deck in decks %}
             <tr>
                 <th scope="row">{% if deck.name %}{{ deck.name }}{% endif %}</th>
-                <td>{% if deck.owner %}{{ deck.owner }}{% endif %}</td>
                 <td>
-                    {% include "matches/color_pips.html" with color=deck.color %}
+                    {% if deck.owner %}
+                    <a href="{% url 'person_stats' person_id=deck.owner_id %}">
+                        {{ deck.owner }}
+                    </a>
+                {% endif %}</td>
+                <td>
+                    {% include "matches/color_pips.html" with color=deck.color name=deck.get_color_display %}
                 </td>
                 <td>{{ deck.commander }}</td>
                 <td>{{ deck.get_win_percentage }}</td>

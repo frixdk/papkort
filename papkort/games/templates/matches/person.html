@@ -1,0 +1,78 @@
+{% extends 'matches/base.html' %}
+
+{% block title %}{{ person }}{% endblock %}
+
+{% block content %}
+    <h1>{{ person.name }}'s Statistics</h1>
+    <p>
+        Played <strong>{{ num_matches }}</strong> matches.
+    </p>
+    <p>
+        Won <strong>{{ num_wins }}</strong> matches ({{ win_percentage }}).
+    </p>
+    <div class="table-responsive">
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Played deck</th>
+                <th>Color</th>
+                <th>Total plays </th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for deck in deck_counts %}
+                <tr>
+                    <th scope="row">{{ deck }}</th>
+                    <td>
+                        {% include "matches/color_pips.html" with color=deck.color name=deck.get_color_display %}
+                    </td>
+                    <td>{{ deck.count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Played color</th>
+                <th>Total plays </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for color in color_counts %}
+                <tr>
+                    <td>
+                        {% include "matches/color_pips.html" with color=color.color name=color.color_name %}
+                    </td>
+                    <td>{{ color.count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Played color identity</th>
+                <th>Total plays </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for color in deck_colors|dictsortreversed:"count" %}
+                <tr>
+                    <th scope="row">
+                        {% include "matches/color_pips.html" with color=color.deck__color name=color.color_name %}
+                    </th>
+                    <td>{{ color.count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

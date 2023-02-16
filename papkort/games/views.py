@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from django.db.models import Count
 from django.shortcuts import redirect, render
 
 from .models import Deck, Match, Person, Player
@@ -15,6 +16,49 @@ def matches(request):
     context = {'matches': all_matches}
 
     return render(request, 'matches/matches.html', context)
+
+
+def person_stats(request, person_id):
+    # Count the number of matches played by the person
+    num_matches = Match.objects.filter(players__person_id=person_id).count()
+
+    # Count the number of wins by the person
+    num_wins = Player.objects.filter(position=1, person_id=person_id).count()
+
+    # Compute the win percentage of the person
+    win_percentage = f'{int(num_wins / num_matches * 100)}%' if num_matches > 0 else 'N/A'
+
+    person = Person.objects.get(id=person_id)
+
+    color_counts = defaultdict(lambda: defaultdict(int))
+
+    # Count the number of times each color was played by the person
+    color_identity_counts = person.player_set.values('deck__color').annotate(count=Count('deck__color'))
+    # Append pretty color choice name
+    for color_identity_count in color_identity_counts:
+        color_identity_count['color_name'] = dict(Deck.Color.choices)[color_identity_count['deck__color']]
+
+        for color in color_identity_count['deck__color']:
+            print(color, color_identity_count['count'])
+
+            color_counts[color]['count'] += color_identity_count['count']
+            color_counts[color]['color_name'] = dict(Deck.Color.choices)[color] # yeah, I know
+            color_counts[color]['color'] = color  # yeah, I know
+
+    # ChatGPT couldn't figure this out
+    deck_counts = Deck.objects.filter(player__person=person).annotate(count=Count('player__deck')).order_by('-count')
+
+    context = {
+        'person': person,
+        'num_matches': num_matches,
+        'num_wins': num_wins,
+        'win_percentage': win_percentage,
+        'deck_colors': color_identity_counts,
+        'deck_counts': deck_counts,
+        'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True)
+    }
+
+    return render(request, 'matches/person.html', context)
 
 
 def players(request):
@@ -60,8 +104,6 @@ def players(request):
     context = {'players': sorted(player_data.values(), key=lambda x: x['win_percentage'], reverse=True)}
 
     return render(request, 'matches/players.html', context)
-
-
 
 
 def decks(request):
