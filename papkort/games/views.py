@@ -1,10 +1,8 @@
-# Create your views here.
 from collections import defaultdict
 
-from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from .models import Deck, Match, Player
+from .models import Deck, Match, Person, Player
 
 
 def index(request):
@@ -12,9 +10,9 @@ def index(request):
 
 
 def matches(request):
-    matches = Match.objects.order_by('date')
+    all_matches = Match.objects.order_by('date')
 
-    context = {'matches': matches}
+    context = {'matches': all_matches}
 
     return render(request, 'matches/matches.html', context)
 
@@ -67,7 +65,7 @@ def players(request):
 
 
 def decks(request):
-    decks = Deck.objects.all()
+    all_decks = Deck.objects.all()
 
     order = {
         'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
@@ -79,19 +77,19 @@ def decks(request):
         'wubrg': 31
     }
 
-    context = {'decks': sorted(decks, key=lambda x: order[x.color])}
+    context = {'decks': sorted(all_decks, key=lambda x: order[x.color])}
 
     return render(request, 'matches/decks.html', context)
 
 
 def stats(request):
-    players = Player.objects.all()
+    all_players = Player.objects.all()
 
     person_positions = defaultdict(list)
     deck_positions = defaultdict(list)
     person_deck_color = defaultdict(lambda: defaultdict(int))
 
-    for player in players:
+    for player in all_players:
         person_positions[player.person].append(player.position)
         deck_positions[player.deck].append(player.position)
 
