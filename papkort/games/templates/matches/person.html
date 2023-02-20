@@ -17,6 +17,8 @@
                 <th scope="col">Played deck</th>
                 <th>Color</th>
                 <th>Total plays </th>
+                <th>Wins</th>
+                <th>Win %</th>
             </tr>
             </thead>
             <tbody>
@@ -27,6 +29,8 @@
                         {% include "matches/color_pips.html" with color=deck.color name=deck.get_color_display %}
                     </td>
                     <td>{{ deck.count }}</td>
+                    <td>{{ deck.wins }}</td>
+                    <td>{{ deck.win_percentage }}</td>
                 </tr>
             {% endfor %}
             </tbody>

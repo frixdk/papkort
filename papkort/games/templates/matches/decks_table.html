@@ -7,8 +7,9 @@
             <th scope="col">Color</th>
             <th scope="col">Commander</th>
             <th scope="col">Win percentage</th>
-        <th scope="col">Description</th>
-        <th scope="col">Decklist</th>
+            <th scope="col">Total plays</th>
+            <th scope="col">Description</th>
+            <th scope="col">Decklist</th>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +27,7 @@
                 </td>
                 <td>{{ deck.commander }}</td>
                 <td>{{ deck.get_win_percentage }}</td>
+                <td>{{ deck.get_plays }}</td>
                 <td>{{ deck.description }}</td>
                 <td>
                     {% if deck.url %}

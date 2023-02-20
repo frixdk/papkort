@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.db.models import Count
+from django.db.models import Case, Count, IntegerField, When
 from django.shortcuts import redirect, render
 
 from .models import Deck, Match, Person, Player
@@ -11,7 +11,7 @@ def index(request):
 
 
 def matches(request):
-    all_matches = Match.objects.order_by('date')
+    all_matches = Match.objects.order_by('-date')
 
     context = {'matches': all_matches}
 
@@ -45,9 +45,16 @@ def person_stats(request, person_id):
             color_counts[color]['color_name'] = dict(Deck.Color.choices)[color] # yeah, I know
             color_counts[color]['color'] = color  # yeah, I know
 
-    # ChatGPT couldn't figure this out
-    deck_counts = Deck.objects.filter(player__person=person).annotate(count=Count('player__deck')).order_by('-count')
+    # We do this to count the plays and wins for the specific player and the deck
+    deck_counts = Deck.objects.filter(player__person=person).annotate(
+        count=Count('player__deck'),
+        wins=Count(Case(When(player__position=1, then=1), output_field=IntegerField()))
+    ).order_by('-count')
 
+    for d in deck_counts:
+        d.win_percentage = f'{int(d.wins / d.count * 100)}%'
+
+    # This win percentage on decks is shown no matter who played it
     owned_decks = Deck.objects.filter(owner=person)
 
     order = {
