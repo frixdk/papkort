@@ -13,6 +13,12 @@
         <th>Games played</th>
         <th>Wins</th>
         <th>Win %</th>
+        <th>4p Games played</th>
+        <th>4p Wins</th>
+        <th>4p Win %</th>
+        <th>3p Games played</th>
+        <th>3p Wins</th>
+        <th>3p Win %</th>
         <th>Most played color</th>
         <th>Most played deck</th>
     </tr>
@@ -29,6 +35,12 @@
                 <td>{{ player.games_played }}</td>
                 <td>{{ player.games_won }}</td>
                 <td>{{ player.win_percentage }}</td>
+                <td>{{ player.4p_games_played }}</td>
+                <td>{{ player.4p_games_won }}</td>
+                <td>{{ player.4p_win_percentage }}</td>
+                <td>{{ player.3p_games_played }}</td>
+                <td>{{ player.3p_games_won }}</td>
+                <td>{{ player.3p_win_percentage }}</td>
                 <td>
                     {% include "matches/color_pips.html" with color=player.favorite_color %}
                 </td>

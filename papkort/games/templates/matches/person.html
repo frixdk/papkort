@@ -4,12 +4,38 @@
 
 {% block content %}
     <h3>{{ person.name }}'s Statistics</h3>
-    <p>
-        Played <strong>{{ num_matches }}</strong> matches.
-    </p>
-    <p>
-        Won <strong>{{ num_wins }}</strong> matches ({{ win_percentage }}).
-    </p>
+
+    <div class="table-responsive">
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th>Total games</th>
+                <th>Total wins</th>
+                <th>Total win %</th>
+                <th>4p games</th>
+                <th>4p wins</th>
+                <th>4p win %</th>
+                <th>3p games</th>
+                <th>3p wins</th>
+                <th>3p win %</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ num_matches }}</td>
+                    <td>{{ num_wins }}</td>
+                    <td>{{ win_percentage }}</td>
+                    <td>{{ num_matches_4p }}</td>
+                    <td>{{ num_wins_4p }}</td>
+                    <td>{{ win_percentage_4p }}</td>
+                    <td>{{ num_matches_3p }}</td>
+                    <td>{{ num_wins_3p }}</td>
+                    <td>{{ win_percentage_3p }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-dark">
             <thead>

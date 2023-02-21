@@ -20,13 +20,23 @@ def matches(request):
 
 def person_stats(request, person_id):
     # Count the number of matches played by the person
-    num_matches = Match.objects.filter(players__person_id=person_id).count()
+    matches = Match.objects.annotate(player_count=Count('players')).filter(players__person_id=person_id)
+    matches_4p = matches.filter(player_count=4)
+    matches_3p = matches.filter(player_count=3)
+    num_matches = matches.count()
+    num_matches_4p = matches_4p.count()
+    num_matches_3p = matches_3p.count()
 
     # Count the number of wins by the person
-    num_wins = Player.objects.filter(position=1, person_id=person_id).count()
+    all_wins = Player.objects.filter(position=1, person_id=person_id)
+    num_wins = all_wins.count()
+    num_wins_4p = all_wins.filter(match__in=matches_4p).count()
+    num_wins_3p = all_wins.filter(match__in=matches_3p).count()
 
     # Compute the win percentage of the person
     win_percentage = f'{int(num_wins / num_matches * 100)}%' if num_matches > 0 else 'N/A'
+    win_percentage_4p = f'{int(num_wins_4p / num_matches_4p * 100)}%' if num_matches_4p > 0 else 'N/A'
+    win_percentage_3p = f'{int(num_wins_3p / num_matches_3p * 100)}%' if num_matches_3p > 0 else 'N/A'
 
     person = Person.objects.get(id=person_id)
 
@@ -39,8 +49,6 @@ def person_stats(request, person_id):
         color_identity_count['color_name'] = dict(Deck.Color.choices)[color_identity_count['deck__color']]
 
         for color in color_identity_count['deck__color']:
-            print(color, color_identity_count['count'])
-
             color_counts[color]['count'] += color_identity_count['count']
             color_counts[color]['color_name'] = dict(Deck.Color.choices)[color] # yeah, I know
             color_counts[color]['color'] = color  # yeah, I know
@@ -72,6 +80,12 @@ def person_stats(request, person_id):
         'num_matches': num_matches,
         'num_wins': num_wins,
         'win_percentage': win_percentage,
+        'num_matches_3p': num_matches_3p,
+        'num_wins_3p': num_wins_3p,
+        'win_percentage_3p': win_percentage_3p,
+        'num_matches_4p': num_matches_4p,
+        'num_wins_4p': num_wins_4p,
+        'win_percentage_4p': win_percentage_4p,
         'deck_colors': color_identity_counts,
         'deck_counts': deck_counts,
         'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True),
@@ -88,7 +102,10 @@ def players(request):
         'person': None,
         'games_played': 0,
         'games_won': 0,
-        'games_lost': 0,
+        '4p_games_played': 0,
+        '4p_games_won': 0,
+        '3p_games_played': 0,
+        '3p_games_won': 0,
         'colors': {
             'w': 0,
             'u': 0,
@@ -105,6 +122,12 @@ def players(request):
         player_data[player.person]['person'] = player.person
         player_data[player.person]['games_played'] += 1
         player_data[player.person]['games_won'] += 1 if player.position == 1 else 0
+        if player.match.players.count() == 4:
+            player_data[player.person]['4p_games_played'] += 1
+            player_data[player.person]['4p_games_won'] += 1 if player.position == 1 else 0
+        if player.match.players.count() == 3:
+            player_data[player.person]['3p_games_played'] += 1
+            player_data[player.person]['3p_games_won'] += 1 if player.position == 1 else 0
         player_data[player.person]['deck_plays'][player.deck] += 1
 
         if player.deck.color == 'colorless':
@@ -116,6 +139,8 @@ def players(request):
     # Calc win percentage most played color stuff lolo
     for entry in player_data.values():
         entry['win_percentage'] = int(entry['games_won'] / entry['games_played'] * 100)
+        entry['4p_win_percentage'] = int(entry['4p_games_won'] / entry['4p_games_played'] * 100) if entry['4p_games_played'] else 'N/A'
+        entry['3p_win_percentage'] = int(entry['3p_games_won'] / entry['3p_games_played'] * 100) if entry['3p_games_played'] else 'N/A'
         entry['favorite_color'] = max(entry['colors'], key=entry['colors'].get)
         entry['owned_decks'] = entry['person'].deck_set.count
         entry['favorite_deck'] = max(entry['deck_plays'], key=entry['deck_plays'].get)
