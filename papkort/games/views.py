@@ -20,7 +20,7 @@ def matches(request):
 
 def person_stats(request, person_id):
     # Count the number of matches played by the person
-    matches = Match.objects.annotate(player_count=Count('players')).filter(players__person_id=person_id)
+    matches = Match.objects.prefetch_related('players').annotate(player_count=Count('players')).filter(players__person_id=person_id)
     matches_4p = matches.filter(player_count=4)
     matches_3p = matches.filter(player_count=3)
     num_matches = matches.count()
@@ -28,7 +28,7 @@ def person_stats(request, person_id):
     num_matches_3p = matches_3p.count()
 
     # Count the number of wins by the person
-    all_wins = Player.objects.filter(position=1, person_id=person_id)
+    all_wins = Player.objects.prefetch_related('person', 'deck', 'match').filter(position=1, person_id=person_id)
     num_wins = all_wins.count()
     num_wins_4p = all_wins.filter(match__in=matches_4p).count()
     num_wins_3p = all_wins.filter(match__in=matches_3p).count()
@@ -96,7 +96,7 @@ def person_stats(request, person_id):
 
 
 def players(request):
-    all_players = Player.objects.all()
+    all_players = Player.objects.prefetch_related('match', 'deck', 'person', 'person__deck_set').annotate(match_player_count=Count('match__players'))
 
     player_data = defaultdict(lambda: {
         'person': None,
@@ -122,10 +122,10 @@ def players(request):
         player_data[player.person]['person'] = player.person
         player_data[player.person]['games_played'] += 1
         player_data[player.person]['games_won'] += 1 if player.position == 1 else 0
-        if player.match.players.count() == 4:
+        if player.match_player_count == 4:
             player_data[player.person]['4p_games_played'] += 1
             player_data[player.person]['4p_games_won'] += 1 if player.position == 1 else 0
-        if player.match.players.count() == 3:
+        if player.match_player_count == 3:
             player_data[player.person]['3p_games_played'] += 1
             player_data[player.person]['3p_games_won'] += 1 if player.position == 1 else 0
         player_data[player.person]['deck_plays'][player.deck] += 1
@@ -152,7 +152,7 @@ def players(request):
 
 
 def decks(request):
-    all_decks = Deck.objects.all()
+    all_decks = Deck.objects.all().prefetch_related('player_set')
 
     order = {
         'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
