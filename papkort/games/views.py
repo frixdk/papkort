@@ -11,7 +11,7 @@ def index(request):
 
 
 def matches(request):
-    all_matches = Match.objects.order_by('-date')
+    all_matches = Match.objects.order_by('-date').prefetch_related('players', 'players__deck', 'players__person')
 
     context = {'matches': all_matches}
 
@@ -20,7 +20,7 @@ def matches(request):
 
 def person_stats(request, person_id):
     # Count the number of matches played by the person
-    matches = Match.objects.prefetch_related('players').annotate(player_count=Count('players')).filter(players__person_id=person_id)
+    matches = Match.objects.prefetch_related('players', 'players__deck', 'players__person').annotate(player_count=Count('players')).filter(players__person_id=person_id)
     matches_4p = matches.filter(player_count=4)
     matches_3p = matches.filter(player_count=3)
     num_matches = matches.count()
@@ -170,7 +170,7 @@ def decks(request):
 
 
 def stats(request):
-    all_players = Player.objects.all()
+    all_players = Player.objects.prefetch_related('match', 'deck', 'person')
 
     person_positions = defaultdict(list)
     deck_positions = defaultdict(list)
