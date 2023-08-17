@@ -51,9 +51,7 @@ class Deck(models.Model):
         if self.color == Deck.Color.COLORLESS:
             return [Deck.Color.COLORLESS]
         else:
-            return [Deck.Color(c).label for c in self.color]
-
-        #if self.color == Color.choices
+            return [c for c in self.color]
 
     name = models.CharField(max_length=64, blank=True, null=True)
     commander = models.CharField(max_length=64)
@@ -64,7 +62,6 @@ class Deck(models.Model):
     owner = models.ForeignKey(Person, on_delete=models.PROTECT, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     url = models.CharField(max_length=128, blank=True, null=True)
-    #pauper = models.BooleanField(default=False)
 
     def get_win_percentage(self):
         won = self.player_set.filter(position=1).count()

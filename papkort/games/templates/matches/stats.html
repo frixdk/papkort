@@ -18,11 +18,11 @@
         </div>
 
         <div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="colors"></canvas></div>
+        <div style="max-width:1000px; padding-left: 5px; padding-bottom:20px"><canvas id="color_wins"></canvas></div>
 
     </div>
 
     <script>
-
         const person_win_percentage = {{ person_win_percentage|safe }}
         const deck_win_percentage = {{ deck_win_percentage|safe }}
         const color_win_percentage = {{ color_win_percentage|safe }}
@@ -30,8 +30,7 @@
         const color_wins = {{ color_wins|safe }}
         const personDeckColors = {{ person_deck_colors|safe }} // Jeg navngiver som det passer mig
 
-
-var color = Chart.helpers.color;
+        var color = Chart.helpers.color;
         var chartColors = {
             red: 'rgb(255, 99, 132)',
             orange: 'rgb(255, 159, 64)',
@@ -199,49 +198,43 @@ var color = Chart.helpers.color;
                 options: colorOptions,
             };
 
-
-
-
 new Chart(
     document.getElementById(elementId), colorConfig
 );
-
-
-
-
 }
 
+        addColorChart('colors', 'All Player Deck Colors', [
+            deck_colors['w'],
+            deck_colors['u'],
+            deck_colors['r'],
+            deck_colors['b'],
+            deck_colors['g'],
+            deck_colors['colorless'],
+        ])
 
+        addColorChart('color_wins', 'Number of wins where color was played', [
+            color_wins['w'],
+            color_wins['u'],
+            color_wins['r'],
+            color_wins['b'],
+            color_wins['g'],
+            color_wins['colorless'],
+        ])
 
-addColorChart('colors', 'All Player Deck Colors', [
-    deck_colors['w'],
-    deck_colors['u'],
-    deck_colors['r'],
-    deck_colors['b'],
-    deck_colors['g'],
-    deck_colors['colorless'],
-])
+        personDeckColors.forEach(function (item, index) {
+            var elem = document.querySelector('#color_wins');
+            var clone = elem.cloneNode(true);
+            clone.id = 'personColor' + item['name'];
+            elem.after(clone);
 
-
-console.log(personDeckColors);
-
-
-
-personDeckColors.forEach(function (item, index) {
-
-    var elem = document.querySelector('#colors');
-    var clone = elem.cloneNode(true);
-    clone.id = 'personColor' + item['name'];
-    elem.after(clone);
-
-    addColorChart(clone.id, item['name'] + ' played colors', [
-        item['w'],
-        item['u'],
-        item['r'],
-        item['b'],
-        item['g'],
-        item['colorless'],
-    ])
+            addColorChart(clone.id, item['name'] + ' played colors', [
+                item['w'],
+                item['u'],
+                item['r'],
+                item['b'],
+                item['g'],
+                item['colorless'],
+            ])
 
 });
 

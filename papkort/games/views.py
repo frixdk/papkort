@@ -241,7 +241,7 @@ def stats(request):
         'deck_win_percentage': sorted(deck_win_percentage, key=lambda x: x["percentage"], reverse=True),
         'color_win_percentage': sorted(color_win_percentage, key=lambda x: x["percentage"], reverse=True),
         'deck_colors': deck_colors,
-        'color_wins': color_wins,
+        'color_wins': dict(color_wins),
         'person_deck_colors': person_deck_colors
     }
 
