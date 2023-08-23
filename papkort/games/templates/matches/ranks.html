@@ -1,0 +1,42 @@
+
+{% extends 'matches/base.html' %}
+
+{% block title %}Ranks{% endblock %}
+
+{% block content %}
+
+    <p>
+        Experimental stuff using <a href="https://openskill.me/en/stable/manual.html">openskill</a>
+    </p>
+    <p>
+        When creating teams the winner is considered rank 1 and all others rank 2
+    </p>
+
+    <div class="table-responsive">
+    <table class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Ordinal</th>
+            <th scope="col">Mu</th>
+            <th scope="col">Sigma</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for name, rank in ranks %}
+            <tr>
+                <th scope="row">{{ name }}</th>
+                <td>{{ rank.ordinal }}</td>
+                <td>{{ rank.mu }}</td>
+                <td>{{ rank.sigma }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+
+
+

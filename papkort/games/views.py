@@ -4,6 +4,7 @@ from django.db.models import Case, Count, IntegerField, When
 from django.shortcuts import redirect, render
 
 from .models import Deck, Match, Person, Player
+from openskill.models import PlackettLuce
 
 
 def index(request):
@@ -246,4 +247,36 @@ def stats(request):
     }
 
     return render(request, 'matches/stats.html', context)
+
+
+def ranks(request):
+    matches = Match.objects.order_by('id').prefetch_related('players', 'players__person', 'players__deck')
+    persons = Person.objects.all()
+    model = PlackettLuce()
+
+    player_ranks = {p.name: model.rating(name=p.name) for p in persons}
+
+    for m in matches:
+        match = []
+        match_ranks = []
+
+        for p in m.players.all():
+            match.append([player_ranks[p.person.name]])
+            if p.position == 1:
+                match_ranks.append(1)
+            else:
+                match_ranks.append(2)
+
+        new_ranks = model.rate(match, ranks=match_ranks)
+
+        for rank in [rank for teams in new_ranks for rank in teams]:
+            # Replace with updated rank
+            player_ranks[rank.name] = rank
+
+    context = {
+        'ranks': sorted(player_ranks.items(), key=lambda x: x[1].ordinal(), reverse=True)
+    }
+
+    return render(request, 'matches/ranks.html', context)
+
 
