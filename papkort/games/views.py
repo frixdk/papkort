@@ -2,9 +2,21 @@ from collections import defaultdict
 
 from django.db.models import Case, Count, IntegerField, When
 from django.shortcuts import redirect, render
-
+from django.db.models import FloatField
+from django.db.models.functions import Cast
+from django.db.models import Q, F
 from .models import Deck, Match, Person, Player
 from openskill.models import PlackettLuce
+
+COLOR_ORDER = {
+    'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
+    'wu': 6, 'ub': 7, 'br': 8, 'rg': 9, 'gw': 10,
+    'wb': 11, 'ur': 12, 'bg': 13, 'rw': 14, 'gu': 15,
+    'wub': 16, 'ubr': 17, 'brg': 18, 'rgw': 19, 'gwu': 20,
+    'wbg': 21, 'urw': 22, 'bgu': 23, 'rwb': 24, 'gur': 25,
+    'wubr': 26, 'ubrg': 27, 'brgw': 28, 'rgwu': 29, 'gwub': 30,
+    'wubrg': 31
+}
 
 
 def index(request):
@@ -64,17 +76,18 @@ def person_stats(request, person_id):
         d.win_percentage = f'{int(d.wins / d.count * 100)}%'
 
     # This win percentage on decks is shown no matter who played it
-    owned_decks = Deck.objects.filter(owner=person)
+    owned_decks = Deck.objects.filter(owner=person).prefetch_related('player_set', 'player_set__person', 'owner').annotate(
+        win_count=Count('player', filter=Q(player__position=1)),
+        played_count=Count('player'),
+        win_percentage=Cast(Cast(F('win_count'), FloatField()) / F('played_count') * 100.0, IntegerField())
+    )
 
-    order = {
-        'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
-        'wu': 6, 'ub': 7, 'br': 8, 'rg': 9, 'gw': 10,
-        'wb': 11, 'ur': 12, 'bg': 13, 'rw': 14, 'gu': 15,
-        'wub': 16, 'ubr': 17, 'brg': 18, 'rgw': 19, 'gwu': 20,
-        'wbg': 21, 'urw': 22, 'bgu': 23, 'rwb': 24, 'gur': 25,
-        'wubr': 26, 'ubrg': 27, 'brgw': 28, 'rgwu': 29, 'gwub': 30,
-        'wubrg': 31
-    }
+    if request.GET.get('ordering') == 'win':
+        owned_decks = sorted(owned_decks, key=lambda x: x.win_count / x.played_count, reverse=True)
+    elif request.GET.get('ordering') == 'total':
+        owned_decks = sorted(owned_decks, key=lambda x: x.played_count, reverse=True)
+    else:
+        owned_decks = sorted(owned_decks, key=lambda x: COLOR_ORDER[x.color])
 
     context = {
         'person': person,
@@ -90,7 +103,7 @@ def person_stats(request, person_id):
         'deck_colors': color_identity_counts,
         'deck_counts': deck_counts,
         'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True),
-        'decks': sorted(owned_decks, key=lambda x: order[x.color])
+        'decks': owned_decks
     }
 
     return render(request, 'matches/person.html', context)
@@ -153,20 +166,18 @@ def players(request):
 
 
 def decks(request):
-    all_decks = Deck.objects.all().prefetch_related('player_set')
+    all_decks = Deck.objects.all().prefetch_related('player_set', 'player_set__person', 'owner').annotate(
+        win_count=Count('player', filter=Q(player__position=1)),
+        played_count=Count('player'),
+        win_percentage=Cast(Cast(F('win_count'), FloatField()) / F('played_count') * 100.0, IntegerField())
+    )
 
-    order = {
-        'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
-        'wu': 6, 'ub': 7, 'br': 8, 'rg': 9, 'gw': 10,
-        'wb': 11, 'ur': 12, 'bg': 13, 'rw': 14, 'gu': 15,
-        'wub': 16, 'ubr': 17, 'brg': 18, 'rgw': 19, 'gwu': 20,
-        'wbg': 21, 'urw': 22, 'bgu': 23,  'rwb': 24,  'gur': 25,
-        'wubr': 26, 'ubrg': 27, 'brgw': 28, 'rgwu': 29, 'gwub': 30,
-        'wubrg': 31
-    }
-
-    context = {'decks': sorted(all_decks, key=lambda x: order[x.color])}
-
+    if request.GET.get('ordering') == 'win':
+        context = {'decks': sorted(all_decks, key=lambda x: x.win_count / x.played_count, reverse=True)}
+    elif request.GET.get('ordering') == 'total':
+        context = {'decks': sorted(all_decks, key=lambda x: x.played_count, reverse=True)}
+    else:
+        context = {'decks': sorted(all_decks, key=lambda x: COLOR_ORDER[x.color])}
     return render(request, 'matches/decks.html', context)
 
 

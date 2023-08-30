@@ -4,10 +4,16 @@
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Owner</th>
-            <th scope="col">Color</th>
+            <th scope="col">
+                <a href="?ordering=color">Color</a>
+            </th>
             <th scope="col">Commander</th>
-            <th scope="col">Win percentage</th>
-            <th scope="col">Total plays</th>
+            <th scope="col">
+                <a href="?ordering=win">Win percentage</a>
+            </th>
+            <th scope="col">
+                <a href="?ordering=total">Total plays</a>
+            </th>
             <th scope="col">Description</th>
             <th scope="col">Decklist</th>
         </tr>
@@ -26,7 +32,7 @@
                     {% include "matches/color_pips.html" with color=deck.color name=deck.get_color_display %}
                 </td>
                 <td>{{ deck.commander }}</td>
-                <td>{{ deck.get_win_percentage }}</td>
+                <td>{{ deck.win_percentage }}% ({{ deck.win_count }}/{{ deck.played_count }})</td>
                 <td>{{ deck.get_plays }}</td>
                 <td>{{ deck.description }}</td>
                 <td>
