@@ -8,6 +8,8 @@ from django.db.models import Q, F
 from .models import Deck, Match, Person, Player
 from openskill.models import PlackettLuce
 
+from .services.game_service import GameService
+
 COLOR_ORDER = {
     'w': 0, 'u': 1, 'b': 2, 'r': 3, 'g': 4, 'colorless': 5,
     'wu': 6, 'ub': 7, 'br': 8, 'rg': 9, 'gw': 10,
@@ -82,10 +84,17 @@ def person_stats(request, person_id):
         win_percentage=Cast(Cast(F('win_count'), FloatField()) / F('played_count') * 100.0, IntegerField())
     )
 
+    game_service = GameService()
+    deck_ranks = game_service.calculate_deck_rankings()
+    for d in owned_decks:
+        d.rating = deck_ranks[d]
+
     if request.GET.get('ordering') == 'win':
         owned_decks = sorted(owned_decks, key=lambda x: x.win_count / x.played_count, reverse=True)
     elif request.GET.get('ordering') == 'total':
         owned_decks = sorted(owned_decks, key=lambda x: x.played_count, reverse=True)
+    elif request.GET.get('ordering') == 'ordinal':
+        owned_decks = sorted(owned_decks, key=lambda x: x.rating.ordinal(), reverse=True)
     else:
         owned_decks = sorted(owned_decks, key=lambda x: COLOR_ORDER[x.color])
 
@@ -172,10 +181,19 @@ def decks(request):
         win_percentage=Cast(Cast(F('win_count'), FloatField()) / F('played_count') * 100.0, IntegerField())
     )
 
+    game_service = GameService()
+    deck_ranks = game_service.calculate_deck_rankings()
+
+    # Add the rating to decks
+    for deck in all_decks:
+        deck.rating = deck_ranks[deck]
+
     if request.GET.get('ordering') == 'win':
-        context = {'decks': sorted(all_decks, key=lambda x: x.win_count / x.played_count, reverse=True)}
+        context = {'decks': sorted(all_decks, key=lambda x: x.win_count / x.played_count if x.played_count else 0, reverse=True)}
     elif request.GET.get('ordering') == 'total':
-        context = {'decks': sorted(all_decks, key=lambda x: x.played_count, reverse=True)}
+        context = {'decks': sorted(all_decks, key=lambda x: x.played_count if x.played_count else 0, reverse=True)}
+    elif request.GET.get('ordering') == 'ordinal':
+        context = {'decks': sorted(all_decks, key=lambda x: x.rating.ordinal(), reverse=True)}
     else:
         context = {'decks': sorted(all_decks, key=lambda x: COLOR_ORDER[x.color])}
     return render(request, 'matches/decks.html', context)
@@ -288,6 +306,8 @@ def ranks(request):
         'ranks': sorted(player_ranks.items(), key=lambda x: x[1].ordinal(), reverse=True)
     }
 
+    context = {
+        'player_ranks': sorted(player_ranks.items(), key=lambda x: x[1].ordinal(), reverse=True)
+    }
+
     return render(request, 'matches/ranks.html', context)
-
-

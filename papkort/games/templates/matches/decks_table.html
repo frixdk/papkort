@@ -14,6 +14,9 @@
             <th scope="col">
                 <a href="?ordering=total">Total plays</a>
             </th>
+            <th scope="col">
+                <a href="?ordering=ordinal">Score</a>
+            </th>
             <th scope="col">Description</th>
             <th scope="col">Decklist</th>
         </tr>
@@ -34,10 +37,11 @@
                 <td>{{ deck.commander }}</td>
                 <td>{{ deck.win_percentage }}% ({{ deck.win_count }}/{{ deck.played_count }})</td>
                 <td>{{ deck.get_plays }}</td>
+                <td title="Mu:{{ deck.rating.mu|floatformat:2 }} Sigma:{{ deck.rating.sigma|floatformat:2 }}">{{ deck.rating.ordinal|floatformat:2 }}</td>
                 <td>{{ deck.description }}</td>
                 <td>
                     {% if deck.url %}
-                    <a href="{{ deck.url }}">{{ deck.url }}</a>
+                    <a href="{{ deck.url }}">[LINK]</a>
                     {% endif %}
                 </td>
             </tr>
