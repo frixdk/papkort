@@ -105,7 +105,7 @@ if os.environ.get("CAPROVER") is None:
 else:
     from .settings_caprover import *
 
-print("pancakes", BASE_DIR, os.path.join(BASE_DIR, "static_src"))
+#print("pancakes", BASE_DIR, os.path.join(BASE_DIR, "static_src"))
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, "static_src"),

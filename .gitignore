@@ -1,2 +1,4 @@
 /papkort/static/
 venv
+/.idea/*
+db.sqlite3

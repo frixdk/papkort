@@ -84,10 +84,13 @@ def person_stats(request, person_id):
         win_percentage=Cast(Cast(F('win_count'), FloatField()) / F('played_count') * 100.0, IntegerField())
     )
 
+    challenge = set()
+
     game_service = GameService()
     deck_ranks = game_service.calculate_deck_rankings()
     for d in owned_decks:
         d.rating = deck_ranks[d]
+        challenge.add(d.color)
 
     if request.GET.get('ordering') == 'win':
         owned_decks = sorted(owned_decks, key=lambda x: x.win_count / x.played_count, reverse=True)
@@ -112,7 +115,8 @@ def person_stats(request, person_id):
         'deck_colors': color_identity_counts,
         'deck_counts': deck_counts,
         'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True),
-        'decks': owned_decks
+        'decks': owned_decks,
+        'built_colors': {color: color[0] in challenge for color in Deck.Color.choices}
     }
 
     return render(request, 'matches/person.html', context)
