@@ -116,7 +116,9 @@ def person_stats(request, person_id):
         'deck_counts': deck_counts,
         'color_counts': sorted(color_counts.values(), key=lambda x: x['count'], reverse=True),
         'decks': owned_decks,
-        'built_colors': {color: color[0] in challenge for color in Deck.Color.choices}
+        'built_colors': {color: color[0] in challenge for color in Deck.Color.choices},
+        'built_progress_count': len(challenge),
+        'built_progress_percentage': int(len(challenge) / 32.0*100)
     }
 
     return render(request, 'matches/person.html', context)
@@ -248,11 +250,15 @@ def stats(request):
         })
 
     color_win_percentage = []
+    color_played_count = {}
+    color_long_name_to_short = {long: short for short, long in Deck.Color.choices}
+
     for color, positions in color_positions.items():
         color_win_percentage.append({
             "color": color,
             "percentage": positions.count(1) / len(positions) * 100
         })
+        color_played_count[(color_long_name_to_short[color], color)] = len(positions)
 
     deck_colors = {
         'w' : 0,
@@ -274,6 +280,7 @@ def stats(request):
         'person_win_percentage': sorted(person_win_percentage, key=lambda x: x["percentage"], reverse=True),
         'deck_win_percentage': sorted(deck_win_percentage, key=lambda x: x["percentage"], reverse=True),
         'color_win_percentage': sorted(color_win_percentage, key=lambda x: x["percentage"], reverse=True),
+        'color_played_count': sorted(color_played_count.items(), key=lambda x: x[1], reverse=True),
         'deck_colors': deck_colors,
         'color_wins': dict(color_wins),
         'person_deck_colors': person_deck_colors

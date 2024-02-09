@@ -13,6 +13,29 @@
             <canvas id="deckWinPercentage"></canvas>
         </div>
 
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">Played color identity</th>
+                        <th>Total plays </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for color, count in color_played_count %}
+                        <tr>
+                            <th scope="row">
+                                {% include "matches/color_pips.html" with color=color.0 name=color.1 %}
+                            </th>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div style="height: 600px; max-width:1000px; padding-left: 5px; padding-bottom:20px">
             <canvas id="colorWinPercentage"></canvas>
         </div>
