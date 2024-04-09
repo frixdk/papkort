@@ -1,13 +1,13 @@
 from collections import defaultdict
 
-from django.db.models import Case, Count, IntegerField, When
-from django.shortcuts import redirect, render
-from django.db.models import FloatField
+from django import forms
+from django_select2 import forms as s2forms
+from django.db.models import Case, Count, F, FloatField, IntegerField, Q, When
 from django.db.models.functions import Cast
-from django.db.models import Q, F
-from .models import Deck, Match, Person, Player
+from django.shortcuts import redirect, render
 from openskill.models import PlackettLuce
 
+from .models import Deck, Match, Person, Player
 from .services.game_service import GameService
 
 COLOR_ORDER = {
@@ -314,11 +314,97 @@ def ranks(request):
             player_ranks[rank.name] = rank
 
     context = {
-        'ranks': sorted(player_ranks.items(), key=lambda x: x[1].ordinal(), reverse=True)
-    }
-
-    context = {
         'player_ranks': sorted(player_ranks.items(), key=lambda x: x[1].ordinal(), reverse=True)
     }
 
     return render(request, 'matches/ranks.html', context)
+
+# FIXME Det her skal flyttes til forms
+class PersonWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        "name__icontains",
+    ]
+
+class DeckWidget(s2forms.ModelSelect2MultipleWidget):
+    search_fields = [
+        "name__icontains",
+        "commander__icontains",
+    ]
+
+class PersonsForm(forms.Form):
+    person1 = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        widget=PersonWidget(attrs={"data-minimum-input-length": 0}))
+    person2 = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        widget=PersonWidget(attrs={"data-minimum-input-length": 0}))
+    person3 = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        widget=PersonWidget(attrs={"data-minimum-input-length": 0}))
+    person4 = forms.ModelChoiceField(
+        queryset=Person.objects.all(),
+        widget=PersonWidget(attrs={"data-minimum-input-length": 0}))
+    deck1 = forms.ModelMultipleChoiceField(
+        queryset=Deck.objects.all(),
+        required=False,
+        widget=DeckWidget(attrs={"data-minimum-input-length": 0})
+    )
+    deck2 = forms.ModelMultipleChoiceField(
+        queryset=Deck.objects.all(),
+        required=False,
+        widget=DeckWidget(attrs={"data-minimum-input-length": 0})
+    )
+    deck3 = forms.ModelMultipleChoiceField(
+        queryset=Deck.objects.all(),
+        required=False,
+        widget=DeckWidget(attrs={"data-minimum-input-length": 0})
+    )
+    deck4 = forms.ModelMultipleChoiceField(
+        queryset=Deck.objects.all(),
+        required=False,
+        widget=DeckWidget(attrs={"data-minimum-input-length": 0})
+    )
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            self.fields["deck1"].queryset = Deck.objects.filter(owner=args[0]["person1"])
+            self.fields["deck2"].queryset = Deck.objects.filter(owner=args[0]["person2"])
+            self.fields["deck3"].queryset = Deck.objects.filter(owner=args[0]["person3"])
+            self.fields["deck4"].queryset = Deck.objects.filter(owner=args[0]["person4"])
+        except TypeError as e:
+            print("EXCEPTION", e)
+
+
+def recs(request):
+    games = None
+    if request.method == "POST":
+        persons_form = PersonsForm(request.POST)
+
+        if persons_form.is_valid():
+            print("valid")
+            data = persons_form.cleaned_data
+
+            if any([data["deck1"], data["deck2"], data["deck3"], data["deck4"]]):
+                print("do magic")
+
+                gameservice = GameService()
+                persons = data["person1"], data["person2"], data["person3"], data["person4"]
+                decks = data["deck1"], data["deck2"], data["deck3"], data["deck4"]
+
+                games = gameservice.matchmaking2(dict(zip(persons, decks)))
+
+            print(data)
+        else:
+            print("invalid", persons_form.errors, "w")
+
+    else:
+        persons_form = PersonsForm(None)
+
+    context = {
+        "persons_form": persons_form,
+        "games": games[:60] if games else []
+    }
+
+    return render(request, "matches/recs.html", context)

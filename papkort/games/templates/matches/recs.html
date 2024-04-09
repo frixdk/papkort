@@ -1,0 +1,90 @@
+
+{% extends 'matches/base.html' %}
+
+{% block title %}Decks{% endblock %}
+
+{% block content %}
+
+    {{ persons_form.media.css }}
+    <style>
+        input, select {width: 100%}
+    </style>
+
+    <form action="#" method="post">
+
+        {% csrf_token %}
+        <div class="container-xl">
+            <div class="row p-1">
+                <div class="col">
+                    {{ persons_form.person1 }}
+                </div>
+                <div class="col">
+                    {{ persons_form.person2 }}
+                </div>
+                <div class="col">
+                    {{ persons_form.person3 }}
+                </div>
+                <div class="col">
+                    {{ persons_form.person4 }}
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col">
+                    {{ persons_form.deck1 }}
+                </div>
+                <div class="col">
+                    {{ persons_form.deck2 }}
+                </div>
+                <div class="col">
+                    {{ persons_form.deck3 }}
+                </div>
+                <div class="col">
+                    {{ persons_form.deck4 }}
+                </div>
+            </div>
+            <div class="row p-3">
+                <div class="col">
+                    <input type="submit" value="Submit">
+                </div>
+            </div>
+
+
+        </div>
+
+    </form>
+    
+    {% if games %}
+    <div class="table-responsive">
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Fairness</th>
+                <th scope="col">Decks</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for decks, fairness, pre in games %}
+                    <tr>
+                        <th scope="row">{{ fairness }}</th>
+                        <td>
+                            {%  for rating in decks %}
+                                {{ rating.name }} {{ rating.ordinal|floatformat:2 }}<br>
+                            {% endfor %}
+                            {{ pre }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {{ persons_form.media.js }}
+    
+
+{% endblock %}
+
+
+
+

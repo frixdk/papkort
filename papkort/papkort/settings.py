@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'games',
+    'django_select2',
 ]
 
 MIDDLEWARE = [
@@ -90,6 +91,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+#SELECT2_THEME = 'classic'
+SELECT2_CSS = ['style/select2.css']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

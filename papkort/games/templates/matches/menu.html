@@ -22,6 +22,9 @@
                     <a class="nav-link {% if request.path == '/ranks' %}active{% endif %}" aria-current="page" href="{% url 'ranks' %}">Ranks</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/recs' %}active{% endif %}" aria-current="page" href="{% url 'recs' %}">Recs</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link " aria-current="page" href="{% url 'admin:index' %}">Admin</a>
                 </li>
             </ul>

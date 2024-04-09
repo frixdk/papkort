@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from . import views
 
@@ -10,4 +10,6 @@ urlpatterns = [
     path('decks', views.decks, name='decks'),
     path('stats', views.stats, name='stats'),
     path('ranks', views.ranks, name='ranks'),
+    path('recs', views.recs, name='recs'),
+    path("select2/", include("django_select2.urls")),
 ]
